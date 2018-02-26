@@ -1,109 +1,57 @@
 import csv
-import os
-from datetime import datetime
-#set a function for two csvfiles
-def bankboss(csvfile):
+ 
 
+def bankpay(csvfile):
+#set a dictionary for Date revenue
 
-#List data:
-	Emp_ID=[]
-	Frist_Name=[]
-	Last_Name=[]
-	DOB=[]
-	SSN=[]
-	State=[]
+	date_revenue={}
+	# set variables to hold counters 
+	month_count=0
+	total_revenue=0
+	prior_row=0
+	monthly_change=0
+	total_change=0
 
-
-
-#State Abbreviations
-	Stat_abbrev= {
-    'Alabama': 'AL',
-    'Alaska': 'AK',
-    'Arizona': 'AZ',
-    'Arkansas': 'AR',
-    'California': 'CA',
-    'Colorado': 'CO',
-    'Connecticut': 'CT',
-    'Delaware': 'DE',
-    'Florida': 'FL',
-    'Georgia': 'GA',
-    'Hawaii': 'HI',
-    'Idaho': 'ID',
-    'Illinois': 'IL',
-    'Indiana': 'IN',
-    'Iowa': 'IA',
-    'Kansas': 'KS',
-    'Kentucky': 'KY',
-    'Louisiana': 'LA',
-    'Maine': 'ME',
-    'Maryland': 'MD',
-    'Massachusetts': 'MA',
-    'Michigan': 'MI',
-    'Minnesota': 'MN',
-    'Mississippi': 'MS',
-    'Missouri': 'MO',
-    'Montana': 'MT',
-    'Nebraska': 'NE',
-    'Nevada': 'NV',
-    'New Hampshire': 'NH',
-    'New Jersey': 'NJ',
-    'New Mexico': 'NM',
-    'New York': 'NY',
-    'North Carolina': 'NC',
-    'North Dakota': 'ND',
-    'Ohio': 'OH',
-    'Oklahoma': 'OK',
-    'Oregon': 'OR',
-    'Pennsylvania': 'PA',
-    'Rhode Island': 'RI',
-    'South Carolina': 'SC',
-    'South Dakota': 'SD',
-    'Tennessee': 'TN',
-    'Texas': 'TX',
-    'Utah': 'UT',
-    'Vermont': 'VT',
-    'Virginia': 'VA',
-    'Washington': 'WA',
-    'West Virginia': 'WV',
-    'Wisconsin': 'WI',
-    'Wyoming': 'WY',}
-
-	with open(csvfile)as emp_data:
-		csvreader= csv.reader(emp_data, delimiter=",")
-	#skip header
+	with open(csvfile, newline="") as revenue_data:
+		csvreader= csv.reader(revenue_data,delimiter=",")
+		#skip header
 		next(csvreader)
-
 		for row in csvreader:
-			Emp_ID.append(row[0])
+			csvDate= row[0]
+			csvrevenue=row[1]
+			month_count=month_count+1
+			total_revenue=total_revenue+ int(csvrevenue)
 
-#Split full name in to first name and last name
-			Full_Name= row[1].split(" ")
-			Frist_Name.append(Full_Name[0])
-			Last_Name.append(Full_Name[1])
+			monthly_change=int(csvrevenue)-prior_row
+			prior_row=int(csvrevenue)
+		#Skip frist row 
+			if(month_count >1):
+		#Calculate monthly Change
+				date_revenue[csvDate]= monthly_change
+		#add up monthy cange and average 
+		row_sum=(sum(date_revenue.values()))
+		average=int(row_sum)/int(month_count)
+		# grab max and min values  from date_revenue dictionary 
+		max_date=max(date_revenue,key=date_revenue.get)
+		max_revenue=date_revenue[max_date]
+		min_date=min(date_revenue,key=date_revenue.get)
+		min_revenue=date_revenue[min_date] 
 
-#Convert DOB from YYYY-MM-DD to MM/DD/YYYY
-			csvDOB= datetime.strptime(row[2],"%Y-%m-%d").strftime("%m/%d/%Y")
-			DOB.append(csvDOB)
 
-#Convert SSN 
-			csvSSN= row[3]
-			csvSSN= csvSSN[-4:]
-			SSN.append("***-**-" + csvSSN)
-#Convert full state to abbreavative state 
-			csvState=row[4]
-			State.append(Stat_abbrev[csvState])
 
-#Zip lists
-	cleaned_csv= zip(Emp_ID,Frist_Name,Last_Name,DOB,SSN,State)
-	print(cleaned_csv)
-#set output file
-	output_file= os.path.join("paybossoutput.csv")
-	with open (output_file,'w',newline='')as datafile:
-		writer= csv.writer(datafile)
-		writer.writerow(["Emp ID","Frist Name","Last Name","DOB","SSN","State"])
-		writer.writerows(cleaned_csv)
+	#output
+	print ("Financial Analysis")
+	print ("-------------------------")
+	print("Total Months:"+str(month_count))
+	print("Total Revenue:$"+str(total_revenue))
+	print("Average Revenue Change: $" + str(int(average)))
+	print("Greatest Increase in Revenue: " + str(max_date) + " " + "($ " + str(max_revenue) + ")")
+	print("Greatest Decrease in Revenue: " + str(min_date) + " " + "($ " + str(min_revenue) + ")")
 
-csvfile1= 'employee_data1.csv'
-csvfile2= 'employee_data2.csv'
-bankboss(csvfile1)
-bankboss(csvfile2)
+csvfile1= 'budget_data_1.csv'
+csvfile2= 'budget_data_2.csv'
+bankpay(csvfile1)
+bankpay(csvfile2)
+
+
+
